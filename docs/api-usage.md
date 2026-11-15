@@ -22,7 +22,7 @@
 
 ## Being a good client
 
-- **User-Agent** on every outside call: `HomeAir/<version> (+https://github.com/sguyon/home-air-quality)`.
+- **User-Agent** on every outside call: `HomeAir/<version>`, the version being the release on the page's build line.
 - **Retry-After.** A 429 or 503 stops every call to that host for as long as `Retry-After` says (15 minutes without it, 6 hours at most). A 429 also writes an alert line to the log.
 - **Backoff.** Other failures (a 5xx, a timeout, no network) pause that source 2 minutes, then 4, 8, 16, up to 30 while it keeps failing. One good answer resets it. A refused token (401) waits 30 minutes.
 - **Daily caps** ([`budgets.py`](../budgets.py)), far above normal use, as a safety stop. Past a cap the server stops calling that source until the next UTC day and logs one line.
@@ -46,4 +46,4 @@
 
 A thousand homes that each open the app 10 times a day make about 35 token calls a minute, plus about 7 area searches a minute with Nearby on.
 
-Want a different interval, lower caps, another endpoint or header? [Open an issue](https://github.com/sguyon/home-air-quality/issues) and we'll change it.
+Want a different interval, lower caps, another endpoint or header? [Open an issue](https://github.com/sguyon/homeair/issues) and we'll change it.

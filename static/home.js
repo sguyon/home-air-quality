@@ -1,4 +1,4 @@
-// Home Air Quality: the home's profiles and road in words, and compass bearings. app.js, sky.js and map.js use these; the home itself
+// Home Air: the home's profiles and road in words, and compass bearings. app.js, sky.js and map.js use these; the home itself
 // comes from the server as window.APP (config.public_view). Twin of config.bearing_in in Python: change both together.
 (function (root) {
   // True if a compass bearing lies in the arc [lo, hi]; lo > hi means the arc crosses north.

@@ -11,8 +11,7 @@ import requests
 import budgets
 
 APP_VERSION = "v0.1"   # the release (server.py shows it on the page's build line)
-PROJECT_URL = "https://github.com/sguyon/home-air-quality"   # in the User-Agent: change it here when the repo moves
-USER_AGENT = f"HomeAir/{APP_VERSION.lstrip('v')} (+{PROJECT_URL})"
+USER_AGENT = f"HomeAir/{APP_VERSION.lstrip('v')}"   # the version comes from APP_VERSION, so a release bump updates it
 _HOST_OF = {}      # source → the host it last called, for usage(): which sources a host's pause holds
 _HOST_UNTIL = {}   # host → when its 429/503 pause ends: every source on that host waits, even one not seen yet
 

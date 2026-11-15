@@ -271,8 +271,8 @@ def test_every_outbound_call_says_who_is_calling(monkeypatch):
     assert {"api.airgradient.com", "api.open-meteo.com", "air-quality-api.open-meteo.com", "satepsanone.nesdis.noaa.gov",
             "pollen.googleapis.com", "map-data.airgradient.com"} <= hosts
     for url, agent in seen:
-        assert agent.startswith("HomeAir/") and upstream.PROJECT_URL in agent, url
-    assert upstream.USER_AGENT == f"HomeAir/{server.APP_VERSION.lstrip('v')} (+https://github.com/sguyon/home-air-quality)"
+        assert agent == upstream.USER_AGENT, url
+    assert upstream.USER_AGENT == f"HomeAir/{server.APP_VERSION.lstrip('v')}"
 
 
 def test_a_429_pauses_every_airgradient_source_for_its_retry_after_and_alerts_once(monkeypatch, caplog):

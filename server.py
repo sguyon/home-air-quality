@@ -1,4 +1,4 @@
-"""Home Air Quality: the Flask app, page, routes, config loading and startup."""
+"""Home Air: the Flask app, page, routes, config loading and startup."""
 
 import base64
 import gzip
@@ -288,8 +288,8 @@ def tag_env(html):
     if not env:
         return html
     html = re.sub(r'(<link rel="(?:icon|apple-touch-icon)"[^>]*href=")/static/icons/', rf'\1/static/icons/{env}/', html)
-    html = html.replace("<title>Home Air Quality</title>", f"<title>{ENV_LABEL[env]} · Home Air Quality</title>", 1)
-    html = html.replace('<meta name="apple-mobile-web-app-title" content="Air Quality">', f'<meta name="apple-mobile-web-app-title" content="AQ {ENV_LABEL[env]}">', 1)
+    html = html.replace("<title>Home Air</title>", f"<title>{ENV_LABEL[env]} · Home Air</title>", 1)
+    html = html.replace('<meta name="apple-mobile-web-app-title" content="Home Air">', f'<meta name="apple-mobile-web-app-title" content="HA {ENV_LABEL[env]}">', 1)
     return html
 
 
@@ -344,7 +344,7 @@ LINK_EXPIRED_ERROR = ("This page is from before the app restarted, so it can't c
 # personal; the app itself has no analytics) and the link preview shown when someone shares the demo's address. Vercel serves
 # the two scripts itself once the project has them on.
 DEMO_SITE = "https://homeair.guyon.dev"
-DEMO_TITLE = "Home Air Quality"
+DEMO_TITLE = "Home Air"
 DEMO_DESCRIPTION = ("See your air quality data next to the weather, pollen, smoke and traffic, "
                     "with insights for your home and outside.")
 DEMO_HEAD_TAGS = (
@@ -358,7 +358,7 @@ DEMO_HEAD_TAGS = (
     f'<meta property="og:description" content="{DEMO_DESCRIPTION}"><meta property="og:url" content="{DEMO_SITE}/">'
     f'<meta property="og:image" content="{DEMO_SITE}/static/og-demo.png">'
     '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:type" content="image/png">'
-    f'<meta property="og:image:alt" content="Home Air Quality on a phone, with an action for each person at home">'
+    f'<meta property="og:image:alt" content="Home Air on a phone, with an action for each person at home">'
     '<meta name="twitter:card" content="summary_large_image">')
 
 
@@ -511,8 +511,8 @@ def manifest():
     env = icon_env()
     data = json.loads(path.read_text())
     if env:   # the installed app gets the DEV / PREVIEW icons and name too
-        data["name"] = f'{data.get("name", "Home Air Quality")} ({ENV_LABEL[env]})'
-        data["short_name"] = f"AQ {ENV_LABEL[env]}"
+        data["name"] = f'{data.get("name", "Home Air")} ({ENV_LABEL[env]})'
+        data["short_name"] = f"HA {ENV_LABEL[env]}"
     for ic in data.get("icons", []):
         src = str(ic.get("src", ""))
         if src.startswith("/static/icons/"):
@@ -818,6 +818,6 @@ if __name__ == "__main__":
     write_pid_file()
     port = int(os.environ.get("PORT", 5555))
     host = os.environ.get("HOST", "127.0.0.1")   # HOST=0.0.0.0 to open it from a phone on the same network
-    print(f"Home Air Quality → http://localhost:{port}")
+    print(f"Home Air → http://localhost:{port}")
     print_setup_link(port)
     app.run(host=host, port=port, debug=False)

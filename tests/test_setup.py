@@ -219,7 +219,7 @@ def test_one_nominatim_request_with_user_agent_and_no_second_geocoder(root, monk
     code, out = run(root, capsys, "--address", "Missing place")
     assert code == 1 and "Couldn't find it" in out
     assert len(seen) == 1 and seen[0][0] == setup.NOMINATIM_SEARCH
-    assert "sguyon/home-air-quality" in seen[0][1]["headers"]["User-Agent"]
+    assert seen[0][1]["headers"]["User-Agent"] == setup.USER_AGENT and setup.USER_AGENT.startswith("HomeAir/")
 
 
 def test_stale_monitor_fails_live_check_after_writing(root, monkeypatch, capsys):
@@ -510,7 +510,7 @@ def test_setup_md_asks_one_question_at_a_time_with_or_without_a_question_tool():
     assert "no question tool" not in intro
 
 
-LAST_MESSAGE = ["Home Air Quality is ready at this address:", "http://localhost:5555",
+LAST_MESSAGE = ["Home Air is ready at this address:", "http://localhost:5555",
                 "It stops when this computer restarts. I can make it start by itself when you log in.",
                 "I can also help you set it up on a home server with Docker, or online with Railway."]
 

@@ -58,7 +58,7 @@ The setup (`SETUP.md`, `scripts/setup.py`, the token page) is a stranger's first
 - `publicmap.py`: AirGradient's public monitors for any home or the demo: the ones in an area of its public map (one small request), the nearest, the outdoor source an indoor-only home is offered at setup, a monitor's reading row, its place on the public map and its history there. No import of `demo/` or `server.py`.
 - `demo/`: the demo's home (`config.toml`), its made-up data (`data.py`), its three moments and three hidden one-monitor cases (`moments.py`) and the public monitors' pages at `?monitor=<id>` (`public.py`).
 - `scripts/`: `setup.py` (prepares an empty token entry, discovers monitors, writes household choices with a backup, checks config and readings; `railway` transfers saved settings through stdin and `--live` checks a running page), `check_config.py`, `screenshot.sh` (the README's images, from the demo), `vercel_build.sh` (the demo's build on Vercel).
-- `Dockerfile`, `docker-compose.yml` and `.dockerignore`: the container (DEPLOYMENT.md, "Docker"). `.github/workflows/image.yml` publishes the image to `ghcr.io/sguyon/home-air-quality` from `main`.
+- `Dockerfile`, `docker-compose.yml` and `.dockerignore`: the container (DEPLOYMENT.md, "Docker"). `.github/workflows/image.yml` publishes the image to `ghcr.io/sguyon/homeair` from `main`, and to the old name `ghcr.io/sguyon/home-air-quality` so existing installs keep updating.
 - `tests/`: Python tests (pytest) and page tests (`*.test.mjs`, Node's test runner).
 
 ## Run

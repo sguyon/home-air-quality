@@ -11,8 +11,8 @@ Tested on Mac and Linux. On Windows, use WSL or Docker.
 Work in this repo folder throughout. If needed:
 
 ```bash
-git clone https://github.com/sguyon/home-air-quality
-cd home-air-quality
+git clone https://github.com/sguyon/homeair
+cd home-air
 ```
 
 Run every command below from this folder through `scripts/run.sh`: it uses uv, installs uv if it's missing, or falls back to Python 3.11 or newer, and says which; if none works, it stops and says what to install. To see what's done and the next command at any point, run `scripts/run.sh scripts/setup.py --status`; it changes nothing. Some commands wait on purpose (`--wait-token` up to 90 seconds, `--start` up to 30, `--live` up to 10 for an app just started): run them with a timeout of at least 100 seconds, so one call returns the result; don't poll.
@@ -97,7 +97,7 @@ With no address it checks the copy `--start` started (for any other page, Docker
 
 End with this message, with the real port, and nothing after it:
 
-> Home Air Quality is ready at this address:
+> Home Air is ready at this address:
 >
 > http://localhost:5555
 >
@@ -111,7 +111,7 @@ The address goes alone on its line, plain; don't say a tab is open. If they ask:
 - For a home server: `scripts/run.sh scripts/setup.py --home-server`, then pass on its two steps; the server needs Docker. Don't offer to copy it over SSH: give the steps, and do more only if they ask. Once they've started it, check `scripts/run.sh scripts/setup.py --live http://<the server>:8000` if you can reach it.
 - Online: [DEPLOYMENT.md](DEPLOYMENT.md#railway).
 
-For later sessions, not for the message: the app writes to `app.log` in this folder, and starts again with `cd /path/to/home-air-quality && scripts/run.sh scripts/setup.py --start` (with `PORT=` first if it isn't 5555).
+For later sessions, not for the message: the app writes to `app.log` in this folder, and starts again with `cd /path/to/home-air && scripts/run.sh scripts/setup.py --start` (with `PORT=` first if it isn't 5555).
 
 Change names, profiles, drying equipment (`[home] appliances`) or limits in `config.toml`; [config.example.toml](config.example.toml) explains the settings. Restart after editing config or `.env` by hand. Keep a private copy of config; it isn't in git. Optional [pollen, road tracing, new profiles and Vercel demo](docs/optional.md); [Railway and Docker deployment](DEPLOYMENT.md).
 

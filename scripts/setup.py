@@ -29,8 +29,7 @@ import sources  # installs the request-log filter that hides query credentials
 from config import (ENV_FILE_MODE, PLACE_DECIMALS, PROFILES, ConfigError, defines,
                     env_key, load_config, parse_dotenv, public_view, write_env_key)
 
-REPO_URL = "https://github.com/sguyon/home-air-quality"
-USER_AGENT = f"home-air-quality-setup/1.0 (+{REPO_URL})"  # Nominatim requires an identifying User-Agent.
+from upstream import USER_AGENT  # Nominatim requires an identifying User-Agent: the app's, HomeAir/<version>.
 NOMINATIM_SEARCH = "https://nominatim.openstreetmap.org/search"
 NOMINATIM_REVERSE = "https://nominatim.openstreetmap.org/reverse"
 OPEN_METEO_FORECAST = "https://api.open-meteo.com/v1/forecast"  # timezone=auto resolves a point's timezone.
@@ -518,7 +517,7 @@ def live(url, env, root, get=None, now=None, wait=0):
               "setup.py --live http://localhost:<port>")
         return 1
     if not isinstance(health, dict) or health.get("status") != "ok":
-        print(f"{base}/health didn't say ok: is this Home Air Quality?")
+        print(f"{base}/health didn't say ok: is this Home Air?")
         return 1
     print(f"Page: answers at {base}")
     token = bool(health.get("airgradient_token_set"))
@@ -535,7 +534,7 @@ def live(url, env, root, get=None, now=None, wait=0):
     except Exception:
         app = None
     if app is None:
-        problem("the page has no settings (window.APP): is this Home Air Quality?")
+        problem("the page has no settings (window.APP): is this Home Air?")
     elif "now" in app:
         problem("the page runs the demo (made-up data). Restart it from the folder with config.toml.")
     elif cfg is not None:

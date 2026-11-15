@@ -838,7 +838,7 @@ test('the logo follows freshness: green while fresh, grey when stale, offline or
   assert.match(svg, /<path d="M0 17\.5h32M16 17\.5v15" stroke="#000" stroke-width="2\.6"\/>/);
   assert.match(svg, /<path class="lg-glow" d="M8\.6 16\.2A7\.4 7\.4 0 0 1 23\.4 16\.2Z"\/><path class="lg-dot" d="M11\.6 16\.2A4\.4 4\.4 0 0 1 20\.4 16\.2Z"\/>/);
   assert.doesNotMatch(html + app + css, /mk-g|mk-sky|mk-fr|mk-br|mk-dot|--mark-top|--mark-hor/);
-  assert.match(html, /<span class="vh" id="mark-name">Home Air Quality<\/span>/);
+  assert.match(html, /<span class="vh" id="mark-name">Home Air<\/span>/);
 });
 
 test('the weather line has no time and no live dot; the "Today" heading is hidden but still read out', () => {

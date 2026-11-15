@@ -1,11 +1,11 @@
-# <img src="static/icons/icon.svg" alt="" width="28" height="28"> Home Air Quality
+# <img src="static/icons/icon.svg" alt="" width="28" height="28"> Home Air
 
 An app for your AirGradient monitors that tells you what to do about your air: when to open the window, when to keep it shut, when to go for a run. It combines your readings with the forecast, pollen, wildfire smoke and the public monitors around you.
 
 **[Try the demo](https://homeair.guyon.dev)** · [Installation](#installation) · [Features](#features) · [How it works](#how-it-works)
 
 <p align="center">
-  <img src="docs/hero-light.png" alt="Home Air Quality on a laptop and a phone" width="800">
+  <img src="docs/hero-light.png" alt="Home Air on a laptop and a phone" width="800">
 </p>
 
 <sub>Screenshots from the demo, with sample data.</sub>
@@ -21,7 +21,7 @@ You need one or two AirGradient monitors (indoor, outdoor or both) on AirGradien
 **With a coding agent** (Claude Code or Codex). Open your agent in an empty folder and paste:
 
 ```
-Clone https://github.com/sguyon/home-air-quality and set up Home Air Quality for my home by following its SETUP.md.
+Clone https://github.com/sguyon/homeair and set up Home Air for my home by following its SETUP.md.
 ```
 
 It connects AirGradient, asks your location and profiles, writes your config and runs the page on your computer. It can then keep it running, or help you put it on a home server with Docker or online with Railway ([`DEPLOYMENT.md`](DEPLOYMENT.md)).
@@ -87,7 +87,7 @@ AirGradient monitors measure particles with a laser sensor (Plantower). Outdoors
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="The full Home Air Quality page from the demo: today's actions, the profiles, the day chart, the home monitors, local conditions and the neighborhood map" width="720">
+  <img src="docs/screenshot.png" alt="The full Home Air page from the demo: today's actions, the profiles, the day chart, the home monitors, local conditions and the neighborhood map" width="720">
 </p>
 
 ## Credits

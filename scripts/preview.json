@@ -1,7 +1,7 @@
 {
   "_": "Settings for scripts/preview.sh: the link-preview images' words, the demo moment and what the phone shows. Change a word, run scripts/preview.sh.",
   "moment": "rush",
-  "name": "Home Air Quality",
+  "name": "Home Air",
   "large": {
     "line1": "Open-source app for AirGradient monitors",
     "line2": "",
