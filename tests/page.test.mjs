@@ -25,7 +25,7 @@ const GLOBALS = new Set(('if for while switch catch return typeof new function a
   'parseFloat parseInt isNaN isFinite encodeURIComponent decodeURIComponent structuredClone queueMicrotask btoa atob ' +
   'Intl URL URLSearchParams IntersectionObserver ResizeObserver MutationObserver PointerEvent alert confirm ' +
   // not code: CSS functions inside template strings, and a word inside a regex
-  'calc var Yesterday').split(' '));
+  'calc var Yesterday AbortController').split(' '));
 
 test('app.js calls only functions that exist', () => {
   const missing = new Set();
@@ -921,3 +921,87 @@ test('the Connected card opens the home by itself once setup has restarted the a
   assert.deepEqual(asked.map(a => a[0]), ['/api/setup', '/api/setup', '/api/setup']);   // a failed ask (the app restarting) is asked again
   assert.ok(asked.every(a => a[1] === 'no-store'));
 });
+
+// The server fetches AirGradient at most every 5 minutes for every tab (docs/api-usage.md). The
+// page asks it again when someone comes back to it, on Refresh, and every 5 minutes while the tab is on screen.
+test('the one timer that asks for readings is the visible-tab re-check, every 5 minutes', () => {
+  const app = files[0];
+  const asking = [...app.matchAll(/setInterval\(([^;]*)/g)].filter(m => /refresh|getJSON|fetch\(|loadCharts|loadRead|recheck/.test(m[1]));
+  assert.equal(asking.length, 0);   // no free-running timer asks for readings: recheckTimer arms one tick at a time
+  assert.match(app, /recheck = recheckTimer\(\{ refresh, visibility: \(\) => document\.visibilityState \}\);\s*recheck\.arm\(\);/);
+  assert.equal(home.RECHECK_MS, 5 * 60 * 1000 + 10 * 1000);   // just past the server's 5-minute cache
+  assert.match(app, /addEventListener\('', \(\) => \{ recheck\.arm\(\); refreshIfDue\(\); \}\)/);   // strings are blanked in `files`
+  assert.equal(home.recheckDue({ visibility: 'visible' }), true);
+  assert.equal(home.recheckDue({ visibility: 'hidden' }), false);   // a hidden tab never polls
+  assert.equal(home.recheckDue({ visibility: 'prerender' }), false);
+});
+
+// A refresh whose request never answers used to hold the page's one-refresh-at-a-time guard forever, so a wall
+// tablet stopped re-checking. Now each fetch gives up after 20 s, a refresh after 60 s, and the timer re-arms itself.
+test('a refresh that hangs does not stop the re-checks at 5, 10 and 15 minutes', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'Date'] });
+  const timers = { setTimeout, clearTimeout };
+  let calls = 0;
+  const hangsFirst = () => { calls++; return calls === 1 ? new Promise(() => {}) : Promise.resolve(); };
+  const refresh = home.singleFlight(hangsFirst, { timers });
+  let visibility = 'visible';
+  const timer = home.recheckTimer({ refresh, visibility: () => visibility, timers });
+  timer.arm();
+  const at = [];
+  const flush = () => new Promise(r => setImmediate(r));
+  const minutes = async n => { for (let i = 0; i < n * 6; i++) { t.mock.timers.tick(10 * 1000); await flush(); } };
+  await minutes(1);
+  for (const min of [6, 11, 16]) {
+    await minutes(5);
+    at.push([min, calls]);
+  }
+  assert.deepEqual(at, [[6, 1], [11, 2], [16, 3]]);   // asks at 5:10, 10:20, 15:30: the first hung, the next two still asked
+  assert.equal(home.REFRESH_TIMEOUT_MS, 60 * 1000);
+  assert.equal(home.FETCH_TIMEOUT_MS, 20 * 1000);
+  visibility = 'hidden';
+  timer.arm();                                          // what visibilitychange does
+  assert.equal(timer.armed(), false);
+  await minutes(30);
+  assert.equal(calls, 3);                               // hidden: no asks
+  visibility = 'visible';
+  timer.arm();
+  await minutes(6);
+  assert.equal(calls, 4);                               // shown again: re-armed
+});
+
+test('a call during a refresh shares it; a stuck one is dropped after the timeout', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let calls = 0;
+  const run = home.singleFlight(() => { calls++; return new Promise(() => {}); }, { timeoutMs: 1000, timers: { setTimeout, clearTimeout } });
+  const a = run(), b = run();
+  assert.equal(a, b);
+  await new Promise(r => setImmediate(r));
+  assert.equal(calls, 1);
+  t.mock.timers.tick(1000);
+  await assert.rejects(a, /timed out/);
+  run().catch(() => {});
+  await new Promise(r => setImmediate(r));
+  assert.equal(calls, 2);
+});
+
+test('every API read gives up after the fetch timeout, and the refresh guard is the shared helper', () => {
+  const app = readFileSync(new URL('static/app.js', root), 'utf8');
+  assert.match(app, /const ctl = new AbortController\(\), timer = setTimeout\(\(\) => ctl\.abort\(\), FETCH_TIMEOUT_MS\);/);
+  assert.match(app, /fetch\(apiUrl\(url\), \{ \.\.\.opts, signal: ctl\.signal \}\)/);
+  assert.match(app, /const refreshOnce = singleFlight\(/);
+  assert.match(app, /if \(recheck\) recheck\.arm\(\);/);   // any refresh restarts the re-check, before it can hang
+  assert.doesNotMatch(app, /inFlight/);
+});
+
+test('coming back to the page refreshes only when what it shows is older than the server interval', () => {
+  const app = readFileSync(new URL('static/app.js', root), 'utf8');
+  assert.match(app, /addEventListener\('visibilitychange', \(\) => \{ recheck\.arm\(\); refreshIfDue\(\); \}\)/);
+  assert.match(app, /addEventListener\('focus', refreshIfDue\)/);
+  assert.match(app, /\$\('read-refresh'\)\.addEventListener\('click', \(\) => refresh\(\{ manual: true \}\)\)/);
+  const now = 1_000_000_000;
+  assert.equal(home.REFRESH_STALE_MS, 5 * 60 * 1000);
+  assert.equal(home.refreshDue({ hidden: false, last: now - 60 * 1000, now }), false);       // a minute old: the cache would answer the same
+  assert.equal(home.refreshDue({ hidden: false, last: now - 5 * 60 * 1000, now }), true);
+  assert.equal(home.refreshDue({ hidden: true, last: 0, now }), false);                      // a hidden tab never asks
+});
+

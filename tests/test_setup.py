@@ -57,8 +57,8 @@ OUTDOOR = {"locationId": 7002, "locationType": "outdoor", "locationName": "Porch
 def root(tmp_path, monkeypatch):
     monkeypatch.setattr(setup.requests, "get", lambda *a, **k: pytest.fail("Unexpected network request"))
     monkeypatch.setattr(setup, "account_rows", lambda token, **k: [dict(INDOOR)])
-    monkeypatch.setattr(setup.publicmap, "fetch_world", lambda: [])
-    monkeypatch.setattr(setup.check_config.publicmap, "fetch_world", lambda: [])
+    monkeypatch.setattr(setup.publicmap, "fetch_area", lambda *a, **k: [])
+    monkeypatch.setattr(setup.check_config.publicmap, "fetch_area", lambda *a, **k: [])
     def geo(url, params):
         if url == setup.NOMINATIM_SEARCH:
             return OGDEN
@@ -161,16 +161,16 @@ def test_wrong_monitor_choice_is_refused(root, capsys):
 
 
 def test_public_lookup_failure_is_an_estimate(root, monkeypatch, capsys):
-    def down():
+    def down(*a, **k):
         raise requests.ConnectionError(TOKEN)
-    monkeypatch.setattr(setup.publicmap, "fetch_world", down)
+    monkeypatch.setattr(setup.publicmap, "fetch_area", down)
     code, out = run(root, capsys, "--address", "Denver")
     assert code == 0 and "estimate" in out and TOKEN not in out
     assert home(root).outdoor_from == "model"
 
 
 def test_accepts_public_source_suggestion(root, monkeypatch, capsys):
-    monkeypatch.setattr(setup.publicmap, "fetch_world", lambda: [{"locationId": 9001, "model": "O-1PST", "latitude": 39.74, "longitude": -104.98, "timestamp": NOW}])
+    monkeypatch.setattr(setup.publicmap, "fetch_area", lambda *a, **k: [{"locationId": 9001, "model": "O-1PST", "latitude": 39.74, "longitude": -104.98, "timestamp": NOW}])
     monkeypatch.setattr(setup.publicmap, "suggest", lambda *a: (9001, None, 1))
     code, out = run(root, capsys, "--address", "Denver")
     assert code == 0, out

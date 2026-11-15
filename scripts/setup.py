@@ -290,7 +290,7 @@ class TokenRefused(SetupError):
 def account_rows(token, timeout=LOOKUP_TIMEOUT):
     try:
         response = requests.get(f"{sources.API_BASE}/locations/measures/current", params={"token": token},
-                                timeout=timeout, allow_redirects=False)
+                                timeout=timeout, allow_redirects=False, headers=sources.upstream.headers())
         if response.status_code in (401, 403):
             raise TokenRefused("AirGradient refused the token. Enter it again on the token page, then try again.")
         response.raise_for_status()
@@ -357,14 +357,15 @@ def choose_monitors(rows, args):
 
 
 def outdoor_source(place):
+    """An indoor-only home's outdoor source, chosen once: the nearest public monitor reporting within
+    publicmap.NEARBY_SOURCE_KM (its id on AirGradient's map, saved as outdoor_from; the app then reads that one monitor
+    alone), "area" or "model". One area request on AirGradient's public map around the home."""
     try:
-        world = publicmap.fetch_world()
-        if not isinstance(world, list):
-            raise ValueError("No public list")
+        world = publicmap.fetch_area(place.lat, place.lon, publicmap.AREA_KM + 1)
         pick, _, _ = publicmap.suggest(world, place.lat, place.lon, datetime.now(timezone.utc))
         return pick
     except Exception:  # optional public discovery must never block household setup
-        print("AirGradient's public list didn't answer. Outdoor air will be an estimate from Open-Meteo's forecast.")
+        print("AirGradient's public map didn't answer. Outdoor air will be an estimate from Open-Meteo's forecast.")
         return "model"
 
 
@@ -621,7 +622,7 @@ def current_check(get, base, cfg, now, problem):
         else:
             print("outdoor source: Open-Meteo's forecast for your area")
         if s.get("fallback"):
-            print("Note: the chosen public monitor isn't reporting now (or AirGradient's list didn't answer): the page "
+            print("Note: the chosen public monitor isn't reporting now (or AirGradient's map didn't answer): the page "
                   "shows the estimate for your area until it's back.")
 
 

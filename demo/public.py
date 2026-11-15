@@ -21,8 +21,8 @@ DEFAULT_LIST = ("New York", 40.71, -73.95)   # the picker's list before anyone g
 # so its pollen card shows no calendar rather than New York's
 DEMO_REGION_KM = 300
 
-UNKNOWN = "Monitor {id} isn't on AirGradient's public map"   # the id isn't an outdoor monitor of the world list
-WORLD_DOWN = "AirGradient's public map didn't answer"   # the world list failed or timed out
+UNKNOWN = "Monitor {id} isn't on AirGradient's public map"   # the map has no AirGradient monitor with that id
+WORLD_DOWN = "AirGradient's public map didn't answer"   # the map failed or timed out
 
 # the demo home's three profiles, as in the samples: a public monitor is outdoor only, so the toddler waits for an indoor
 # monitor (greyed, with its reason) and the sinus profile reads pollen alone, like an outdoor-only home's
@@ -31,13 +31,13 @@ PROFILES = {"toddler": True, "sinus": True, "runner": True}
 # s: how long a request waits on a monitor's weather, PM2.5 model or NOAA smoke before answering without it (a late
 # fetch still lands in the cache for the next request); Open-Meteo answers in about a second
 MONITOR_WAIT = 6
-# s: the most one request waits on upstreams in all (the world list, the map, weather, model, smoke, in series in the
+# s: the most one request waits on upstreams in all (the map, weather, model, smoke, in series in the
 # demo): Vercel stops a request at 30 s (vercel.json maxDuration), and start-up and the rest need the remainder
 REQUEST_BUDGET = 20
 
 
 def _tz_of(monitor):
-    """The monitor's timezone as the world list gives it, when it names a real one; else UTC (none, or junk)."""
+    """The monitor's timezone as the map gives it, when it names a real one; else UTC (none, or junk)."""
     name = monitor.get("timezone")
     try:
         ZoneInfo(name)

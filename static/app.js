@@ -153,11 +153,17 @@ const store = {
 
 // force: the Refresh button asks the server to skip its cache (it still ignores repeats within 15 s)
 let forceNext = false;
+// Every API read gives up after FETCH_TIMEOUT_MS (home.js), so a request that never answers can't hold a refresh.
 async function getJSON(url, opts = {}) {
   if (forceNext) opts = { ...opts, headers: { ...(opts.headers || {}), 'X-Force-Refresh': '1' } };
-  const r = await fetch(apiUrl(url), opts);
-  if (!r.ok) throw new Error(`${url} ${r.status}`);
-  return r.json();
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const r = await fetch(apiUrl(url), { ...opts, signal: ctl.signal });
+    if (!r.ok) throw new Error(`${url} ${r.status}`);
+    return await r.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function homeHour() {
@@ -987,7 +993,7 @@ async function loadRead(force) {
 
 // ── Refresh ───────────────────────────────────────────
 
-let inFlight = null, lastRefresh = 0;
+let lastRefresh = 0, recheck = null;
 
 // How often the Connected card asks whether setup has restarted the app with the home, in ms: soon enough to feel
 // immediate, rare enough to cost nothing while the agent works.
@@ -1024,14 +1030,13 @@ function showNoToken() {
 
 // manual: the person pressed refresh, so show the busy state from the first request and write a new read.
 // busy: show the updating state without asking for a new summary (the first load)
-function refresh({ manual = false, busy = false } = {}) {
-  if (APP.state === 'no_token') { showNoToken(); return Promise.resolve(); }
-  if (inFlight) return inFlight;
-  const showBusy = manual || busy;
-  if (manual) manualBusy = true;
-  if (showBusy) setBusy(true);
-  if (manual) revealNext = true;
-  inFlight = (async () => {
+// One refresh at a time (home.js singleFlight): a call meanwhile shares it; one stuck past REFRESH_TIMEOUT_MS is
+// dropped so the next starts.
+const refreshOnce = singleFlight(async ({ manual = false, busy = false } = {}) => {
+    const showBusy = manual || busy;
+    if (manual) manualBusy = true;
+    if (showBusy) setBusy(true);
+    if (manual) revealNext = true;
     try {
       if (showBusy) setPhase('read');
       forceNext = manual;
@@ -1055,10 +1060,12 @@ function refresh({ manual = false, busy = false } = {}) {
       if (showBusy) setBusy(false);
       showUpdated();
       lastRefresh = Date.now();
-      inFlight = null;
     }
-  })();
-  return inFlight;
+}, { timeoutMs: REFRESH_TIMEOUT_MS });
+function refresh(opts) {
+  if (APP.state === 'no_token') { showNoToken(); return Promise.resolve(); }
+  if (recheck) recheck.arm();   // any refresh (Refresh, coming back) restarts the re-check from now; a hung one can't stop it
+  return refreshOnce(opts).catch(err => console.error('refresh', err));
 }
 
 $('ranges').addEventListener('click', e => {
@@ -1083,10 +1090,18 @@ if (cached && cached.read && (navigator.onLine === false || Date.now() - cached.
   if (navigator.onLine === false) showBootRead(); else setTimeout(showBootRead, 1500);
 }
 refresh({ busy: true });   // the first load shows the updating state; the saved summary stays readable meanwhile
-setInterval(() => { if (!document.hidden) refresh(); }, 60000);   // background tabs don't poll
-document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastRefresh > 60000) refresh(); });
+// Coming back to the page asks again once what it shows is older than the server's refresh interval (home.js
+// refreshDue); the Refresh button asks at any time. A hidden tab never asks.
+const refreshIfDue = () => { if (refreshDue({ hidden: document.hidden, last: lastRefresh, now: Date.now() })) refresh(); };
+// A tab left on screen (a wall tablet) re-checks the server every 5 minutes, which answers from its own cache (it asks
+// AirGradient at most that often anyway). Hidden, the timer stops; shown again, it's armed again.
+recheck = recheckTimer({ refresh, visibility: () => document.visibilityState });
+recheck.arm();
+document.addEventListener('visibilitychange', () => { recheck.arm(); refreshIfDue(); });
+window.addEventListener('focus', refreshIfDue);
+window.addEventListener('pageshow', e => { if (e.persisted) refreshIfDue(); });   // back from the browser's page cache
 window.addEventListener('offline', showUpdated);
-window.addEventListener('online', () => { showUpdated(); refresh(); });
+window.addEventListener('online', () => { showUpdated(); refresh(); });   // back online: catch up once
 
 // ── Theme ─────────────────────────────────────────────
 
