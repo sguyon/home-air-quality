@@ -107,7 +107,7 @@ def test_main_binds_localhost_unless_host_is_set(monkeypatch, capsys):
     monkeypatch.setenv("HOST", "0.0.0.0")
     runpy.run_path(path, run_name="__main__")
     assert [c["host"] for c in calls] == ["127.0.0.1", "0.0.0.0"] and calls[0]["port"] == 5599
-    assert "Home Air Quality → http://localhost:5599" in capsys.readouterr().out
+    assert "Home Air → http://localhost:5599" in capsys.readouterr().out
 
 
 def test_expired_token_is_not_no_token(reloaded, monkeypatch):

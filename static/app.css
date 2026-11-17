@@ -1,4 +1,4 @@
-/* Home Air Quality: page styles. Theme tokens, then components and their responsive/state rules. */
+/* Home Air: page styles. Theme tokens, then components and their responsive/state rules. */
 :root { --card: #fff; --bad: #b42318; --sky: #2f7fb8; --accent: #1c7488; --accent-ink: #155a6b; --accent-soft: #e6f4f7; --accent-line: #a6d3dd;
   --ai-bg: #e7eef8; --ai-line: #cdd9ea; --pill: rgba(255, 255, 255, .72); --tile: #f4f7fb; --q-bg: #f6f8fb; --q-line: #d5dee6; --q-ink: #24384a;
   --q-hover: #e7eef5; --ico-sky: #e3f1fb; --ico-ink: #e7eef5; --ico-smoke: #f3eee8; --smoke: #8a5a32; --series-in: #0f2233; --series-out: #2f7fb8;

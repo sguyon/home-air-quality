@@ -57,8 +57,8 @@ OUTDOOR = {"locationId": 7002, "locationType": "outdoor", "locationName": "Porch
 def root(tmp_path, monkeypatch):
     monkeypatch.setattr(setup.requests, "get", lambda *a, **k: pytest.fail("Unexpected network request"))
     monkeypatch.setattr(setup, "account_rows", lambda token, **k: [dict(INDOOR)])
-    monkeypatch.setattr(setup.publicmap, "fetch_world", lambda: [])
-    monkeypatch.setattr(setup.check_config.publicmap, "fetch_world", lambda: [])
+    monkeypatch.setattr(setup.publicmap, "fetch_area", lambda *a, **k: [])
+    monkeypatch.setattr(setup.check_config.publicmap, "fetch_area", lambda *a, **k: [])
     def geo(url, params):
         if url == setup.NOMINATIM_SEARCH:
             return OGDEN
@@ -161,16 +161,16 @@ def test_wrong_monitor_choice_is_refused(root, capsys):
 
 
 def test_public_lookup_failure_is_an_estimate(root, monkeypatch, capsys):
-    def down():
+    def down(*a, **k):
         raise requests.ConnectionError(TOKEN)
-    monkeypatch.setattr(setup.publicmap, "fetch_world", down)
+    monkeypatch.setattr(setup.publicmap, "fetch_area", down)
     code, out = run(root, capsys, "--address", "Denver")
     assert code == 0 and "estimate" in out and TOKEN not in out
     assert home(root).outdoor_from == "model"
 
 
 def test_accepts_public_source_suggestion(root, monkeypatch, capsys):
-    monkeypatch.setattr(setup.publicmap, "fetch_world", lambda: [{"locationId": 9001, "model": "O-1PST", "latitude": 39.74, "longitude": -104.98, "timestamp": NOW}])
+    monkeypatch.setattr(setup.publicmap, "fetch_area", lambda *a, **k: [{"locationId": 9001, "model": "O-1PST", "latitude": 39.74, "longitude": -104.98, "timestamp": NOW}])
     monkeypatch.setattr(setup.publicmap, "suggest", lambda *a: (9001, None, 1))
     code, out = run(root, capsys, "--address", "Denver")
     assert code == 0, out
@@ -219,7 +219,7 @@ def test_one_nominatim_request_with_user_agent_and_no_second_geocoder(root, monk
     code, out = run(root, capsys, "--address", "Missing place")
     assert code == 1 and "Couldn't find it" in out
     assert len(seen) == 1 and seen[0][0] == setup.NOMINATIM_SEARCH
-    assert "sguyon/home-air-quality" in seen[0][1]["headers"]["User-Agent"]
+    assert seen[0][1]["headers"]["User-Agent"] == setup.USER_AGENT and setup.USER_AGENT.startswith("HomeAir/")
 
 
 def test_stale_monitor_fails_live_check_after_writing(root, monkeypatch, capsys):
@@ -510,7 +510,7 @@ def test_setup_md_asks_one_question_at_a_time_with_or_without_a_question_tool():
     assert "no question tool" not in intro
 
 
-LAST_MESSAGE = ["Home Air Quality is ready at this address:", "http://localhost:5555",
+LAST_MESSAGE = ["Home Air is ready at this address:", "http://localhost:5555",
                 "It stops when this computer restarts. I can make it start by itself when you log in.",
                 "I can also help you set it up on a home server with Docker, or online with Railway."]
 

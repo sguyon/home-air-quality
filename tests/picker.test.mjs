@@ -18,9 +18,9 @@ test('top on sample 2: only 2 is marked, no sample name, the three ways in order
   assert.deepEqual(current(html), ['2']);
   for (const n of [1, 2, 3]) assert.match(html, new RegExp(`<a href="\\?sample=${n}"`));
   assert.doesNotMatch(html, /dt-now|>All clear</);   // no sample name under See a demo (Sacha, 2026-11-12: remove it)
-  assert.match(html, /<h1 class="dt-name"><svg class="dt-mark"[^>]*>.*?<\/svg>Home Air Quality <span class="dt-tag">Demo<\/span><\/h1>/);
-  // the pitch, in Sacha's words (2026-11-12); "open-source" links to the repo
-  assert.match(html, /<p class="dt-pitch">An <a href="https:\/\/github\.com\/sguyon\/home-air-quality">open-source<\/a> app for your AirGradient monitors\. <span>It adds the weather forecast, pollen and more, and tells you what to do for profiles like young kids, allergies or running\.<\/span><\/p>/);   // the second sentence in regular weight
+  assert.match(html, /<h1 class="dt-name"><svg class="dt-mark"[^>]*>.*?<\/svg>Home Air <span class="dt-tag">Demo<\/span><\/h1>/);
+  // the pitch, in Sacha's words (2026-11-15); "open-source" links to the repo
+  assert.match(html, /<p class="dt-pitch"><a href="https:\/\/github\.com\/sguyon\/homeair">Open-source<\/a> app for your AirGradient monitors: <span>see your air quality next to the weather, pollen, smoke and traffic, with insights for your home and outside\.<\/span><\/p>/);   // the second part in regular weight
   assert.doesNotMatch(html, /Free and|timed actions/);
   const at = TITLES.map(t => html.indexOf(`</span>${t}</p>`));
   assert.ok(at[0] > 0 && at[0] < at[1] && at[1] < at[2], String(at));
@@ -32,7 +32,7 @@ test('top on sample 2: only 2 is marked, no sample name, the three ways in order
   assert.match(html, /<button type="button" class="dt-pick" id="db-pick" aria-haspopup="dialog" aria-expanded="false" aria-controls="db-pop"><i class="live" aria-hidden="true"><\/i><span class="dt-pick-t">Select a monitor<\/span><svg class="i"[^>]*>.*?<\/svg><\/button>/);
   assert.match(html, /<span class="dt-pickwrap" id="db-pickwrap">/);
   // Setup: GitHub's mark on the left, the word, the drawn ↗ (it opens a new tab)
-  assert.match(html, /<a class="dt-btn" href="https:\/\/github\.com\/sguyon\/home-air-quality#installation" target="_blank" rel="noopener" aria-label="Setup, on GitHub"><svg class="dt-gh"[^>]*>.*?<\/svg>Setup<svg class="dt-bi"[^>]*>.*?<\/svg><\/a>/);
+  assert.match(html, /<a class="dt-btn" href="https:\/\/github\.com\/sguyon\/homeair#installation" target="_blank" rel="noopener" aria-label="Setup, on GitHub"><svg class="dt-gh"[^>]*>.*?<\/svg>Setup<svg class="dt-bi"[^>]*>.*?<\/svg><\/a>/);
   assert.doesNotMatch(html, /Setup guide/);
   assert.equal((html.match(/<svg /g) || []).length, 8);   // the logo, three way icons, the chevron, GitHub's mark, the arrow, the fold's chevron
   // every arrow and chevron drawn: a text arrow shows as an emoji on iOS (Sacha, 2026-11-12); the old bar's parts are gone

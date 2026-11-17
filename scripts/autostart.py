@@ -52,7 +52,7 @@ def launchd_plist(root, home, port, host=None):
 
 def systemd_unit(root, port, host=None):
     return (
-        "[Unit]\nDescription=Home Air Quality\n\n"
+        "[Unit]\nDescription=Home Air\n\n"
         "[Service]\n"
         f'WorkingDirectory="{root}"\n'
         f'ExecStart=/bin/sh "{root / "scripts" / "run.sh"}" server.py\n'
