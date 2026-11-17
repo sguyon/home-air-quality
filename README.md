@@ -2,7 +2,7 @@
 
 An app for your AirGradient monitors that tells you what to do about your air: when to open the window, when to keep it shut, when to go for a run. It combines your readings with the forecast, pollen, wildfire smoke and the public monitors around you.
 
-**[Try the demo](https://homeair.guyon.dev)** · [Installation](#installation) · [Features](#features) · [How it works](#how-it-works)
+**[Try the demo](https://homeair.app)** · [Installation](#installation) · [Features](#features) · [How it works](#how-it-works)
 
 <p align="center">
   <img src="docs/hero-light.png" alt="Home Air on a laptop and a phone" width="800">
@@ -12,7 +12,7 @@ An app for your AirGradient monitors that tells you what to do about your air: w
 
 ## Demo
 
-[The demo](https://homeair.guyon.dev) shows an example home or the live readings of any public AirGradient monitor.
+[The demo](https://homeair.app) shows an example home or the live readings of any public AirGradient monitor.
 
 ## Installation
 

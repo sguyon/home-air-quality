@@ -41,7 +41,7 @@ The page checks the token with AirGradient, lists the account's monitors, saves 
 
 Can't find the token: tell them to press "Show me where" under step 1 on the page. It opens a marked picture of AirGradient's settings page: 1 General Settings in the left menu, 2 the Connectivity tab, 3 API Access, where they turn it on and press the copy button. Walk them through those marks in words. Don't open pictures in another app: a picture of a web page in its own window looks clickable.
 
-No monitor yet (the user says so, or the page says the account has none): stop the setup. Tell them to set up the monitor with AirGradient's instructions and come back, and that meanwhile [the demo](https://homeair.guyon.dev) shows the live readings of any public AirGradient monitor ("Near me").
+No monitor yet (the user says so, or the page says the account has none): stop the setup. Tell them to set up the monitor with AirGradient's instructions and come back, and that meanwhile [the demo](https://homeair.app) shows the live readings of any public AirGradient monitor ("Near me").
 
 Fallback, when the token page can't open: open `.env` in the user's text editor (`open -e .env` on Mac, `xdg-open .env` on Linux). Wait while they fill the empty `AIRGRADIENT_TOKEN=` line and save. Restart the app afterwards. Check only set/missing with `scripts/check_config.py`; before config exists, setup itself checks the token with AirGradient without showing it.
 

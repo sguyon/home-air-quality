@@ -343,7 +343,7 @@ LINK_EXPIRED_ERROR = ("This page is from before the app restarted, so it can't c
 # The public demo's head only (never a copy a household runs): Vercel Web Analytics and Speed Insights (cookieless, nothing
 # personal; the app itself has no analytics) and the link preview shown when someone shares the demo's address. Vercel serves
 # the two scripts itself once the project has them on.
-DEMO_SITE = "https://homeair.guyon.dev"
+DEMO_SITE = "https://homeair.app"
 DEMO_TITLE = "Home Air"
 DEMO_DESCRIPTION = ("See your air quality data next to the weather, pollen, smoke and traffic, "
                     "with insights for your home and outside.")
