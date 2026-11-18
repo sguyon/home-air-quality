@@ -65,11 +65,11 @@ def test_plist_starts_the_app_from_the_folder():
     assert plist["StandardOutPath"] == plist["StandardErrorPath"] == "/x/a b/app.log"
 
 
-def test_unit_quotes_the_path():
+def test_unit_uses_an_unquoted_working_directory():
     unit = autostart.systemd_unit(Path("/x/a b"), 5600)
     assert 'ExecStart=/bin/sh "/x/a b/scripts/run.sh" server.py' in unit
     assert "Environment=PORT=5600" in unit
-    assert 'WorkingDirectory="/x/a b"' in unit
+    assert "WorkingDirectory=/x/a b" in unit.splitlines()
     assert "Restart=on-failure" in unit and "WantedBy=default.target" in unit
 
 

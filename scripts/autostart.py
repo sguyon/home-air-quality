@@ -54,7 +54,7 @@ def systemd_unit(root, port, host=None):
     return (
         "[Unit]\nDescription=Home Air\n\n"
         "[Service]\n"
-        f'WorkingDirectory="{root}"\n'
+        f"WorkingDirectory={root}\n"
         f'ExecStart=/bin/sh "{root / "scripts" / "run.sh"}" server.py\n'
         f"Environment=PORT={port}\n"
         + (f"Environment=HOST={host}\n" if host else "") +
